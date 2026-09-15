@@ -177,18 +177,15 @@
       const now = new Date();
       const yyyy = now.getFullYear();
       const mm = String(now.getMonth() + 1).padStart(2, '0');
-      document.getElementById("monthFilter").value = `${yyyy}-${mm}`;
-      
       const firstDay = `${yyyy}-${mm}-01`;
       const lastDay = new Date(yyyy, now.getMonth() + 1, 0).toISOString().split('T')[0];
       
-      // Default Filter di Halaman Laporan
-      document.getElementById("filterStartDate").value = firstDay;
-      document.getElementById("filterEndDate").value = lastDay;
-      
-      // Default Filter Khusus di Kotak Laba Bersih (Halaman Utama)
-      document.getElementById("labaStartDate").value = firstDay;
-      document.getElementById("labaEndDate").value = lastDay;
+      // Mengambil data filter terakhir dari memori (jika ada), jika tidak ada gunakan default bulan ini
+      document.getElementById("monthFilter").value = localStorage.getItem("saved_monthFilter") || `${yyyy}-${mm}`;
+      document.getElementById("labaStartDate").value = localStorage.getItem("saved_labaStart") || firstDay;
+      document.getElementById("labaEndDate").value = localStorage.getItem("saved_labaEnd") || lastDay;
+      document.getElementById("filterStartDate").value = localStorage.getItem("saved_reportStart") || firstDay;
+      document.getElementById("filterEndDate").value = localStorage.getItem("saved_reportEnd") || lastDay;
       
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       document.getElementById("inputTgl").value = now.toISOString().slice(0, 16);
@@ -311,29 +308,31 @@
       document.getElementById("inputTgl").value = now.toISOString().slice(0, 16);
     }
 
-    function deleteTransaction(id) {
-      if (confirm("Hapus catatan ini?")) {
-        transactions = transactions.filter(t => t.id != id);
-        localStorage.setItem("saldoTransactions", JSON.stringify(transactions));
-        saveToCloud();
-        renderApp();
-        showToast("Catatan dihapus");
-      }
-    }
-
     function resetDateFilter() {
       const now = new Date();
       const yyyy = now.getFullYear();
       const mm = String(now.getMonth() + 1).padStart(2, '0');
       document.getElementById("filterStartDate").value = `${yyyy}-${mm}-01`;
       document.getElementById("filterEndDate").value = new Date(yyyy, now.getMonth() + 1, 0).toISOString().split('T')[0];
+      
+      // Hapus memori filter laporan khusus saat tombol reset diklik
+      localStorage.removeItem("saved_reportStart");
+      localStorage.removeItem("saved_reportEnd");
+      
       renderApp();
     }
 
     function renderApp() {
       const selectedMonth = document.getElementById("monthFilter").value; 
       
-      // 1. Data KHUSUS BULAN (Total Ambil, Total Setor, Pengeluaran & Transaksi)
+      // Simpan status filter saat ini ke localStorage
+      localStorage.setItem("saved_monthFilter", document.getElementById("monthFilter").value);
+      localStorage.setItem("saved_labaStart", document.getElementById("labaStartDate").value);
+      localStorage.setItem("saved_labaEnd", document.getElementById("labaEndDate").value);
+      localStorage.setItem("saved_reportStart", document.getElementById("filterStartDate").value);
+      localStorage.setItem("saved_reportEnd", document.getElementById("filterEndDate").value);
+      
+      // 1. Data KHUSUS BULAN
       const monthlyFiltered = transactions.filter(t => t.tgl && t.tgl.startsWith(selectedMonth));
       let sumAmbilMonth = 0, sumSetorMonth = 0, sumPengeluaranMonth = 0;
       monthlyFiltered.forEach(t => {
@@ -342,7 +341,7 @@
         sumPengeluaranMonth += Number(t.pengeluaran) || 0;
       });
 
-      // 2. Data KUMULATIF (Saldo Utama berjalan terus menerus)
+      // 2. Data KUMULATIF
       const cumulativeFiltered = transactions.filter(t => t.tgl && t.tgl.slice(0, 7) <= selectedMonth);
       let cumAmbil = 0, cumSetor = 0;
       cumulativeFiltered.forEach(t => {
@@ -351,7 +350,7 @@
       });
       let saldoUtama = cumAmbil - cumSetor;
 
-      // 3. Data LABA BERSIH CUSTOM (Khusus Kotak Laba Bersih di Dashboard)
+      // 3. Data LABA BERSIH CUSTOM
       const labaStart = document.getElementById("labaStartDate").value;
       const labaEnd = document.getElementById("labaEndDate").value;
       const labaFiltered = transactions.filter(t => {
@@ -368,7 +367,7 @@
       });
       let labaCustomDashboard = (labaSetor * 0.15) - labaPengeluaran;
 
-      // Update Teks Tampilan Utama Dashboard
+      // Update Tampilan Utama
       document.getElementById("summarySaldo").textContent = formatRupiah(saldoUtama);
       document.getElementById("summaryLaba").textContent = formatRupiah(labaCustomDashboard);
       document.getElementById("totalAmbil").textContent = formatRupiah(sumAmbilMonth);
@@ -376,7 +375,7 @@
       document.getElementById("totalPengeluaran").textContent = formatRupiah(sumPengeluaranMonth);
       document.getElementById("totalCatatan").textContent = `${monthlyFiltered.length} Transaksi`;
       
-      // 4. Data Filter di Halaman Laporan (Riwayat Transaksi)
+      // 4. Data Filter Halaman Laporan
       const startDate = document.getElementById("filterStartDate").value;
       const endDate = document.getElementById("filterEndDate").value;
       const reportFiltered = transactions.filter(t => {
@@ -393,7 +392,6 @@
       });
       let reportLabaBersih = (reportSetor * 0.15) - reportPengeluaran;
       
-      // Update Teks Tampilan Halaman Laporan
       document.getElementById("reportFilteredLaba").textContent = formatRupiah(reportLabaBersih);
       document.getElementById("reportCount").textContent = `${reportFiltered.length} data`;
       const fullHtml = reportFiltered.map(renderItemHTML).join("");
