@@ -7,160 +7,161 @@
   <title>Pencatatan Saldo & Keuangan</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans pb-24">
-  <header class="bg-blue-600 text-white p-5 pb-8 rounded-b-3xl shadow-md">
+<body class="bg-slate-50 text-slate-800 font-sans pb-28 text-sm sm:text-base">
+  <header class="bg-blue-600 text-white p-6 pb-9 rounded-b-3xl shadow-md">
     <div class="max-w-xl mx-auto flex justify-between items-center">
       <div>
-        <h1 class="text-xl font-bold">Laporan Saldo</h1>
-        <p class="text-xs text-blue-100 mt-0.5">Pencatatan Ambil, Setor & Pengeluaran</p>
+        <h1 class="text-2xl font-bold">Laporan Saldo</h1>
+        <p class="text-xs sm:text-sm text-blue-100 mt-1">Pencatatan Ambil, Setor & Pengeluaran</p>
       </div>
-      <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold text-sm">💰</div>
+      <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-xl">💰</div>
     </div>
   </header>
-  <main class="max-w-xl mx-auto p-4 -mt-4 space-y-4">
-    <div id="filterBulanContainer" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-      <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Periode Bulan:</span>
-      <input type="month" id="monthFilter" onchange="renderApp()" class="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-1.5 outline-none font-semibold focus:border-blue-600">
+  <main class="max-w-xl mx-auto p-4 -mt-5 space-y-4">
+    <div id="filterBulanContainer" class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+      <span class="text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider">Periode Bulan:</span>
+      <input type="month" id="monthFilter" onchange="renderApp()" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm sm:text-base rounded-xl px-3.5 py-2 outline-none font-bold focus:border-blue-600">
     </div>
     <section id="utamaPage" class="app-page space-y-4">
-      <div class="grid grid-cols-2 gap-3">
-        <div class="bg-rose-50 border border-rose-100 p-4 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-rose-500 uppercase tracking-wider block">SALDO UTAMA</span>
-          <h2 id="summarySaldo" class="text-lg font-extrabold text-rose-700 mt-1">Rp 0</h2>
+      <div class="grid grid-cols-2 gap-3.5">
+        <div class="bg-rose-50 border border-rose-100 p-4.5 rounded-2xl shadow-sm">
+          <span class="text-xs font-extrabold text-rose-500 uppercase tracking-wider block">SALDO UTAMA</span>
+          <h2 id="summarySaldo" class="text-xl sm:text-2xl font-black text-rose-700 mt-1">Rp 0</h2>
         </div>
-        <div class="bg-blue-50 border border-blue-100 p-4 rounded-2xl shadow-sm">
-          <span class="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">LABA BERSIH (15%)</span>
-          <h2 id="summaryLaba" class="text-lg font-extrabold text-blue-700 mt-1">Rp 0</h2>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
-          <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-lg">📦</div>
-          <div>
-            <span class="text-[11px] text-slate-400 font-bold block uppercase">Total Ambil</span>
-            <p id="totalAmbil" class="text-sm font-extrabold text-slate-700 mt-0.5">Rp 0</p>
-          </div>
-        </div>
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
-          <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-lg">📥</div>
-          <div>
-            <span class="text-[11px] text-slate-400 font-bold block uppercase">Total Setor</span>
-            <p id="totalSetor" class="text-sm font-extrabold text-slate-700 mt-0.5">Rp 0</p>
-          </div>
+        <div class="bg-blue-50 border border-blue-100 p-4.5 rounded-2xl shadow-sm">
+          <span class="text-xs font-extrabold text-blue-600 uppercase tracking-wider block">LABA BERSIH (15%)</span>
+          <h2 id="summaryLaba" class="text-xl sm:text-2xl font-black text-blue-700 mt-1">Rp 0</h2>
         </div>
       </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
-          <div class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-lg">💸</div>
+      <div class="grid grid-cols-2 gap-3.5">
+        <div class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3.5">
+          <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-xl">📦</div>
           <div>
-            <span class="text-[11px] text-slate-400 font-bold block uppercase">Pengeluaran</span>
-            <p id="totalPengeluaran" class="text-sm font-extrabold text-rose-600 mt-0.5">Rp 0</p>
+            <span class="text-xs text-slate-400 font-bold block uppercase">Total Ambil</span>
+            <p id="totalAmbil" class="text-base sm:text-lg font-black text-slate-700 mt-0.5">Rp 0</p>
           </div>
         </div>
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
-          <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-lg">📋</div>
+        <div class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3.5">
+          <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-xl">📥</div>
           <div>
-            <span class="text-[11px] text-slate-400 font-bold block uppercase">Catatan</span>
-            <p id="totalCatatan" class="text-sm font-extrabold text-slate-700 mt-0.5">0 Transaksi</p>
+            <span class="text-xs text-slate-400 font-bold block uppercase">Total Setor</span>
+            <p id="totalSetor" class="text-base sm:text-lg font-black text-slate-700 mt-0.5">Rp 0</p>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3.5">
+        <div class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3.5">
+          <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-xl">💸</div>
+          <div>
+            <span class="text-xs text-slate-400 font-bold block uppercase">Pengeluaran</span>
+            <p id="totalPengeluaran" class="text-base sm:text-lg font-black text-rose-600 mt-0.5">Rp 0</p>
+          </div>
+        </div>
+        <!-- Kotak Catatan sekarang bisa diklik untuk buka Laporan -->
+        <div onclick="switchPage('laporanPage')" class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3.5 cursor-pointer hover:bg-slate-50 transition active:scale-95">
+          <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-xl">📋</div>
+          <div>
+            <span class="text-xs text-slate-400 font-bold block uppercase">Catatan</span>
+            <p id="totalCatatan" class="text-base sm:text-lg font-black text-slate-700 mt-0.5">0 Transaksi</p>
           </div>
         </div>
       </div>
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-6">
-        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
-          <h3 class="font-bold text-slate-700 text-sm">Aktivitas Bulan Ini</h3>
-          <button onclick="switchPage('laporanPage')" class="text-xs text-blue-600 font-bold">Lihat Semua</button>
+        <div class="p-4.5 border-b border-slate-100 flex justify-between items-center">
+          <h3 class="font-bold text-slate-700 text-base">Aktivitas Bulan Ini</h3>
+          <button onclick="switchPage('laporanPage')" class="text-sm text-blue-600 font-bold">Lihat Semua</button>
         </div>
         <div id="recentTransactionList" class="divide-y divide-slate-100">
-          <div class="p-6 text-center text-slate-400 text-xs">Belum ada data transaksi</div>
+          <div class="p-6 text-center text-slate-400 text-sm">Belum ada data transaksi</div>
         </div>
       </div>
     </section>
     <section id="kalkulatorPage" class="app-page hidden space-y-4">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
         <div class="flex justify-between items-center mb-4">
-          <h3 id="formTitle" class="font-bold text-slate-800 text-base">Form Input Saldo Baru</h3>
-          <button id="cancelEditBtn" onclick="resetForm()" class="text-xs text-rose-500 font-bold hidden">Batal Edit</button>
+          <h3 id="formTitle" class="font-bold text-slate-800 text-lg">Form Input Saldo Baru</h3>
+          <button id="cancelEditBtn" onclick="resetForm()" class="text-sm text-rose-500 font-bold hidden">Batal Edit</button>
         </div>
-        <form id="transactionForm" onsubmit="saveTransaction(event)" class="space-y-3.5">
+        <form id="transactionForm" onsubmit="saveTransaction(event)" class="space-y-4">
           <input type="hidden" id="editId">
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">Tanggal & Waktu</label>
-            <input type="datetime-local" id="inputTgl" class="w-full p-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-600" required>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Tanggal & Waktu</label>
+            <input type="datetime-local" id="inputTgl" class="w-full p-3.5 border border-slate-200 rounded-xl text-base outline-none focus:border-blue-600" required>
           </div>
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-2 gap-3.5">
             <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Ambil (Rp)</label>
-              <input type="number" id="inputAmbil" placeholder="0" class="w-full p-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-600">
+              <label class="block text-sm font-bold text-slate-700 mb-1">Ambil (Rp)</label>
+              <input type="number" id="inputAmbil" placeholder="0" class="w-full p-3.5 border border-slate-200 rounded-xl text-base outline-none focus:border-blue-600">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Setor (Rp)</label>
-              <input type="number" id="inputSetor" placeholder="0" class="w-full p-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-600">
+              <label class="block text-sm font-bold text-slate-700 mb-1">Setor (Rp)</label>
+              <input type="number" id="inputSetor" placeholder="0" class="w-full p-3.5 border border-slate-200 rounded-xl text-base outline-none focus:border-blue-600">
             </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">Pengeluaran Kecil (Rp)</label>
-            <input type="number" id="inputPengeluaran" placeholder="0" class="w-full p-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-600">
+            <label class="block text-sm font-bold text-slate-700 mb-1">Pengeluaran Kecil (Rp)</label>
+            <input type="number" id="inputPengeluaran" placeholder="0" class="w-full p-3.5 border border-slate-200 rounded-xl text-base outline-none focus:border-blue-600">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">Keterangan / Catatan</label>
-            <input type="text" id="inputKeterangan" placeholder="Contoh: Tambah barang / cod / dll" class="w-full p-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-600">
+            <label class="block text-sm font-bold text-slate-700 mb-1">Keterangan / Catatan</label>
+            <input type="text" id="inputKeterangan" placeholder="Contoh: Tambah barang / cod / dll" class="w-full p-3.5 border border-slate-200 rounded-xl text-base outline-none focus:border-blue-600">
           </div>
-          <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-sm shadow-md hover:bg-blue-700 transition">
+          <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-base shadow-md hover:bg-blue-700 transition">
             Simpan Catatan
           </button>
         </form>
       </div>
     </section>
         <section id="laporanPage" class="app-page hidden space-y-4">
-      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-        <span class="text-xs font-bold text-slate-600 uppercase tracking-wider block">Filter Laporan & Laba Bersih</span>
-        <div class="grid grid-cols-2 gap-2">
+      <div class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-sm space-y-3.5">
+        <span class="text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider block">Filter Laporan & Laba Bersih</span>
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-[10px] font-bold text-slate-400 mb-1">Dari Tanggal</label>
-            <input type="date" id="filterStartDate" onchange="renderApp()" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-2.5 py-2 outline-none font-semibold focus:border-blue-600">
+            <label class="block text-xs font-bold text-slate-500 mb-1">Dari Tanggal</label>
+            <input type="date" id="filterStartDate" onchange="renderApp()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm sm:text-base rounded-xl px-3 py-2.5 outline-none font-bold focus:border-blue-600">
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-slate-400 mb-1">Sampai Tanggal</label>
-            <input type="date" id="filterEndDate" onchange="renderApp()" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-2.5 py-2 outline-none font-semibold focus:border-blue-600">
+            <label class="block text-xs font-bold text-slate-500 mb-1">Sampai Tanggal</label>
+            <input type="date" id="filterEndDate" onchange="renderApp()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm sm:text-base rounded-xl px-3 py-2.5 outline-none font-bold focus:border-blue-600">
           </div>
         </div>
-        <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl flex justify-between items-center mt-2">
+        <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl flex justify-between items-center mt-2">
           <div>
-            <span class="text-[10px] font-bold text-emerald-600 uppercase block">Laba Bersih Filter Ini</span>
-            <h4 id="reportFilteredLaba" class="text-sm font-extrabold text-emerald-700">Rp 0</h4>
+            <span class="text-xs font-extrabold text-emerald-600 uppercase block">Laba Bersih Filter Ini</span>
+            <h4 id="reportFilteredLaba" class="text-base sm:text-lg font-black text-emerald-700">Rp 0</h4>
           </div>
           <div class="text-right">
-            <span class="text-[10px] font-bold text-slate-400 uppercase block">Total Data</span>
-            <span id="reportCount" class="text-xs font-bold text-slate-700">0 data</span>
+            <span class="text-xs font-bold text-slate-400 uppercase block">Total Data</span>
+            <span id="reportCount" class="text-sm font-bold text-slate-700">0 data</span>
           </div>
         </div>
       </div>
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
-          <h3 class="font-bold text-slate-700 text-sm">Riwayat Transaksi</h3>
-          <button onclick="resetDateFilter()" class="text-xs text-blue-600 font-bold">Reset Filter</button>
+        <div class="p-4.5 border-b border-slate-100 flex justify-between items-center">
+          <h3 class="font-bold text-slate-700 text-base">Riwayat Transaksi</h3>
+          <button onclick="resetDateFilter()" class="text-sm text-blue-600 font-bold">Reset Filter</button>
         </div>
-        <div id="fullTransactionList" class="divide-y divide-slate-100 max-h-[50vh] overflow-y-auto">
-          <div class="p-6 text-center text-slate-400 text-xs">Belum ada data transaksi</div>
+        <div id="fullTransactionList" class="divide-y divide-slate-100 max-h-[55vh] overflow-y-auto">
+          <div class="p-6 text-center text-slate-400 text-sm">Belum ada data transaksi</div>
         </div>
       </div>
     </section>
   </main>
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 h-16 flex justify-around items-center z-40 px-4 shadow-lg">
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 h-18 flex justify-around items-center z-40 px-4 shadow-xl">
     <button onclick="switchPage('utamaPage')" id="navUtama" class="nav-btn flex flex-col items-center gap-1 text-blue-600 font-bold">
-      <span class="text-xl">🏠</span>
-      <small class="text-[10px]">Utama</small>
+      <span class="text-2xl">🏠</span>
+      <small class="text-xs">Utama</small>
     </button>
     <button onclick="switchPage('kalkulatorPage')" id="navKalkulator" class="nav-btn flex flex-col items-center gap-1 text-slate-400 font-medium">
-      <span class="text-xl">➕</span>
-      <small class="text-[10px]">Input</small>
+      <span class="text-2xl">➕</span>
+      <small class="text-xs">Input</small>
     </button>
     <button onclick="switchPage('laporanPage')" id="navLaporan" class="nav-btn flex flex-col items-center gap-1 text-slate-400 font-medium">
-      <span class="text-xl">📊</span>
-      <small class="text-[10px]">Laporan</small>
+      <span class="text-2xl">📊</span>
+      <small class="text-xs">Laporan</small>
     </button>
   </nav>
-  <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-medium shadow-lg hidden z-50"></div>
+  <div id="toast" class="fixed bottom-22 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-2xl hidden z-50"></div>
   <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzwsf3A5osaCrHvFHqhvsEJgxsiD9m9vuNM2-dwu6M_Aj-nD8Z1faC1m0trS_MbMiLM/exec"; 
     let transactions = JSON.parse(localStorage.getItem("saldoTransactions")) || [];
@@ -315,7 +316,7 @@
       document.getElementById("totalPengeluaran").textContent = formatRupiah(sumPengeluaran);
       document.getElementById("totalCatatan").textContent = `${monthlyFiltered.length} Transaksi`;
       const recentHtml = monthlyFiltered.slice(0, 5).map(renderItemHTML).join("");
-      document.getElementById("recentTransactionList").innerHTML = monthlyFiltered.length === 0 ? `<div class="p-6 text-center text-slate-400 text-xs">Belum ada transaksi di bulan ini</div>` : recentHtml;
+      document.getElementById("recentTransactionList").innerHTML = monthlyFiltered.length === 0 ? `<div class="p-6 text-center text-slate-400 text-sm">Belum ada transaksi di bulan ini</div>` : recentHtml;
       const startDate = document.getElementById("filterStartDate").value;
       const endDate = document.getElementById("filterEndDate").value;
       const reportFiltered = transactions.filter(t => {
@@ -334,25 +335,25 @@
       document.getElementById("reportFilteredLaba").textContent = formatRupiah(reportLabaBersih);
       document.getElementById("reportCount").textContent = `${reportFiltered.length} data`;
       const fullHtml = reportFiltered.map(renderItemHTML).join("");
-      document.getElementById("fullTransactionList").innerHTML = reportFiltered.length === 0 ? `<div class="p-6 text-center text-slate-400 text-xs">Tidak ada data transaksi pada rentang tanggal tersebut</div>` : fullHtml;
+      document.getElementById("fullTransactionList").innerHTML = reportFiltered.length === 0 ? `<div class="p-6 text-center text-slate-400 text-sm">Tidak ada data transaksi pada rentang tanggal tersebut</div>` : fullHtml;
     }
     function renderItemHTML(t) {
       return `
-        <div class="p-3.5 hover:bg-slate-50 transition flex justify-between items-center text-xs">
+        <div class="p-4 hover:bg-slate-50 transition flex justify-between items-center text-sm">
           <div class="space-y-1">
             <div class="flex items-center gap-2">
-              <span class="text-slate-400 font-semibold">${formatDate(t.tgl)}</span>
-              ${t.keterangan ? `<span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold">${escapeHTML(t.keterangan)}</span>` : ''}
+              <span class="text-slate-400 font-bold">${formatDate(t.tgl)}</span>
+              ${t.keterangan ? `<span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-lg font-bold">${escapeHTML(t.keterangan)}</span>` : ''}
             </div>
-            <div class="flex gap-3 font-semibold">
+            <div class="flex gap-3 font-semibold mt-1">
               ${t.ambil > 0 ? `<span class="text-slate-600">Ambil: <b class="text-blue-600">${formatRupiah(t.ambil)}</b></span>` : ''}
               ${t.setor > 0 ? `<span class="text-slate-600">Setor: <b class="text-emerald-600">${formatRupiah(t.setor)}</b></span>` : ''}
               ${t.pengeluaran > 0 ? `<span class="text-slate-600">Keluar: <b class="text-rose-600">${formatRupiah(t.pengeluaran)}</b></span>` : ''}
             </div>
           </div>
-          <div class="flex items-center gap-1">
-            <button onclick="editTransaction(${t.id})" class="text-slate-400 hover:text-blue-600 p-2 text-sm transition" title="Edit">✏️</button>
-            <button onclick="deleteTransaction(${t.id})" class="text-slate-300 hover:text-rose-600 p-2 text-sm transition" title="Hapus">🗑️</button>
+          <div class="flex items-center gap-2">
+            <button onclick="editTransaction(${t.id})" class="text-slate-400 hover:text-blue-600 p-2.5 text-base transition" title="Edit">✏️</button>
+            <button onclick="deleteTransaction(${t.id})" class="text-slate-300 hover:text-rose-600 p-2.5 text-base transition" title="Hapus">🗑️</button>
           </div>
         </div>
       `;
