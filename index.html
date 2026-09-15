@@ -5,41 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#2563eb">
   <title>Pencatatan Saldo & Keuangan</title>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    :root {
-      --primary: #2563eb;
-      --bg-app: #f0fdf4;
-    }
-  </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans pb-24">
-
-  <!-- Top Bar / Header -->
   <header class="bg-blue-600 text-white p-5 pb-8 rounded-b-3xl shadow-md">
     <div class="max-w-xl mx-auto flex justify-between items-center">
       <div>
         <h1 class="text-xl font-bold">Laporan Saldo</h1>
         <p class="text-xs text-blue-100 mt-0.5">Pencatatan Ambil, Setor & Pengeluaran</p>
       </div>
-      <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold text-sm">
-        💰
-      </div>
+      <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold text-sm">💰</div>
     </div>
   </header>
-
   <main class="max-w-xl mx-auto p-4 -mt-4 space-y-4">
-
-    <!-- Filter Periode Bulan -->
-    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+    <div id="filterBulanContainer" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
       <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Periode Bulan:</span>
       <input type="month" id="monthFilter" onchange="renderApp()" class="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-1.5 outline-none font-semibold focus:border-blue-600">
     </div>
-
-    <!-- Halaman Utama (Dashboard) -->
     <section id="utamaPage" class="app-page space-y-4">
-      <!-- 2 Kartu Besar Atas -->
       <div class="grid grid-cols-2 gap-3">
         <div class="bg-rose-50 border border-rose-100 p-4 rounded-2xl shadow-sm">
           <span class="text-[11px] font-bold text-rose-500 uppercase tracking-wider block">SALDO UTAMA</span>
@@ -50,8 +33,6 @@
           <h2 id="summaryLaba" class="text-lg font-extrabold text-blue-700 mt-1">Rp 0</h2>
         </div>
       </div>
-
-      <!-- Kotak-Kotak Grid Kategori -->
       <div class="grid grid-cols-2 gap-3">
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
           <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-lg">📦</div>
@@ -60,7 +41,6 @@
             <p id="totalAmbil" class="text-sm font-extrabold text-slate-700 mt-0.5">Rp 0</p>
           </div>
         </div>
-
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
           <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-lg">📥</div>
           <div>
@@ -69,7 +49,6 @@
           </div>
         </div>
       </div>
-
       <div class="grid grid-cols-2 gap-3">
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
           <div class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-lg">💸</div>
@@ -78,7 +57,6 @@
             <p id="totalPengeluaran" class="text-sm font-extrabold text-rose-600 mt-0.5">Rp 0</p>
           </div>
         </div>
-
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
           <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-lg">📋</div>
           <div>
@@ -87,8 +65,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Transaksi Terbaru -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-6">
         <div class="p-4 border-b border-slate-100 flex justify-between items-center">
           <h3 class="font-bold text-slate-700 text-sm">Aktivitas Bulan Ini</h3>
@@ -99,12 +75,14 @@
         </div>
       </div>
     </section>
-
-    <!-- Halaman Kalkulator / Input Cepat -->
     <section id="kalkulatorPage" class="app-page hidden space-y-4">
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-        <h3 class="font-bold text-slate-800 text-base mb-4">Form Input Saldo Baru</h3>
+        <div class="flex justify-between items-center mb-4">
+          <h3 id="formTitle" class="font-bold text-slate-800 text-base">Form Input Saldo Baru</h3>
+          <button id="cancelEditBtn" onclick="resetForm()" class="text-xs text-rose-500 font-bold hidden">Batal Edit</button>
+        </div>
         <form id="transactionForm" onsubmit="saveTransaction(event)" class="space-y-3.5">
+          <input type="hidden" id="editId">
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1">Tanggal & Waktu</label>
             <input type="datetime-local" id="inputTgl" class="w-full p-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-600" required>
@@ -127,29 +105,47 @@
             <label class="block text-xs font-bold text-slate-600 mb-1">Keterangan / Catatan</label>
             <input type="text" id="inputKeterangan" placeholder="Contoh: Tambah barang / cod / dll" class="w-full p-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-600">
           </div>
-          <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-sm shadow-md hover:bg-blue-700 transition">
+          <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-sm shadow-md hover:bg-blue-700 transition">
             Simpan Catatan
           </button>
         </form>
       </div>
     </section>
-
-    <!-- Halaman Laporan Lengkap -->
-    <section id="laporanPage" class="app-page hidden space-y-4">
+        <section id="laporanPage" class="app-page hidden space-y-4">
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <span class="text-xs font-bold text-slate-600 uppercase tracking-wider block">Filter Laporan & Laba Bersih</span>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 mb-1">Dari Tanggal</label>
+            <input type="date" id="filterStartDate" onchange="renderApp()" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-2.5 py-2 outline-none font-semibold focus:border-blue-600">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 mb-1">Sampai Tanggal</label>
+            <input type="date" id="filterEndDate" onchange="renderApp()" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-2.5 py-2 outline-none font-semibold focus:border-blue-600">
+          </div>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl flex justify-between items-center mt-2">
+          <div>
+            <span class="text-[10px] font-bold text-emerald-600 uppercase block">Laba Bersih Filter Ini</span>
+            <h4 id="reportFilteredLaba" class="text-sm font-extrabold text-emerald-700">Rp 0</h4>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">Total Data</span>
+            <span id="reportCount" class="text-xs font-bold text-slate-700">0 data</span>
+          </div>
+        </div>
+      </div>
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="p-4 border-b border-slate-100 flex justify-between items-center">
-          <h3 class="font-bold text-slate-700 text-sm">Semua Riwayat Transaksi</h3>
-          <span id="reportCount" class="text-xs bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full font-semibold">0 data</span>
+          <h3 class="font-bold text-slate-700 text-sm">Riwayat Transaksi</h3>
+          <button onclick="resetDateFilter()" class="text-xs text-blue-600 font-bold">Reset Filter</button>
         </div>
-        <div id="fullTransactionList" class="divide-y divide-slate-100 max-h-[60vh] overflow-y-auto">
+        <div id="fullTransactionList" class="divide-y divide-slate-100 max-h-[50vh] overflow-y-auto">
           <div class="p-6 text-center text-slate-400 text-xs">Belum ada data transaksi</div>
         </div>
       </div>
     </section>
-
   </main>
-
-  <!-- Navigasi Bawah -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 h-16 flex justify-around items-center z-40 px-4 shadow-lg">
     <button onclick="switchPage('utamaPage')" id="navUtama" class="nav-btn flex flex-col items-center gap-1 text-blue-600 font-bold">
       <span class="text-xl">🏠</span>
@@ -164,53 +160,43 @@
       <small class="text-[10px]">Laporan</small>
     </button>
   </nav>
-
-  <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-medium shadow-lg hidden z-50"></div>
-
-  <!-- JavaScript Logika & Sinkronisasi -->
   <script>
-    // URL Google Apps Web App sudah terpasang otomatis
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzwsf3A5osaCrHvFHqhvsEJgxsiD9m9vuNM2-dwu6M_Aj-nD8Z1faC1m0trS_MbMiLM/exec"; 
-
     let transactions = JSON.parse(localStorage.getItem("saldoTransactions")) || [];
-
     document.addEventListener("DOMContentLoaded", () => {
       const now = new Date();
       const yyyy = now.getFullYear();
       const mm = String(now.getMonth() + 1).padStart(2, '0');
       document.getElementById("monthFilter").value = `${yyyy}-${mm}`;
-      
+      const firstDay = `${yyyy}-${mm}-01`;
+      const lastDay = new Date(yyyy, now.getMonth() + 1, 0).toISOString().split('T')[0];
+      document.getElementById("filterStartDate").value = firstDay;
+      document.getElementById("filterEndDate").value = lastDay;
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       document.getElementById("inputTgl").value = now.toISOString().slice(0, 16);
-
       renderApp();
       loadFromCloud();
     });
-
-    function formatRupiah(num) {
-      return "Rp " + Number(num).toLocaleString("id-ID");
-    }
-
+    function formatRupiah(num) { return "Rp " + Number(num).toLocaleString("id-ID"); }
     function formatDate(dateStr) {
       if (!dateStr) return "-";
       const d = new Date(dateStr);
       return d.toLocaleDateString("id-ID", { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
-
     function switchPage(pageId) {
       document.querySelectorAll(".app-page").forEach(p => p.classList.add("hidden"));
       document.getElementById(pageId).classList.remove("hidden");
-
       document.querySelectorAll(".nav-btn").forEach(b => {
         b.classList.remove("text-blue-600", "font-bold");
         b.classList.add("text-slate-400", "font-medium");
       });
-
       if (pageId === 'utamaPage') {
         document.getElementById("navUtama").classList.add("text-blue-600", "font-bold");
         document.getElementById("navUtama").classList.remove("text-slate-400", "font-medium");
-      } else if (pageId === 'kalkulatorPage') {
+        document.getElementById("filterBulanContainer").classList.remove("hidden");
+      } else { document.getElementById("filterBulanContainer").classList.add("hidden"); }
+      if (pageId === 'kalkulatorPage') {
         document.getElementById("navKalkulator").classList.add("text-blue-600", "font-bold");
         document.getElementById("navKalkulator").classList.remove("text-slate-400", "font-medium");
       } else if (pageId === 'laporanPage') {
@@ -219,14 +205,12 @@
       }
       window.scrollTo(0, 0);
     }
-
     function showToast(msg) {
       const t = document.getElementById("toast");
       t.textContent = msg;
       t.classList.remove("hidden");
       setTimeout(() => t.classList.add("hidden"), 2500);
     }
-
     async function loadFromCloud() {
       if (!WEB_APP_URL) return;
       try {
@@ -237,11 +221,8 @@
           localStorage.setItem("saldoTransactions", JSON.stringify(transactions));
           renderApp();
         }
-      } catch (e) {
-        console.log("Sinkronisasi cloud gagal, menggunakan data lokal.");
-      }
+      } catch (e) { console.log("Sinkronisasi cloud gagal."); }
     }
-
     async function saveToCloud() {
       if (!WEB_APP_URL) return;
       try {
@@ -251,84 +232,110 @@
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: "data=" + encodeURIComponent(JSON.stringify({ transactions }))
         });
-      } catch (e) {
-        console.log("Simpan cloud tertunda.");
-      }
+      } catch (e) { console.log("Simpan cloud tertunda."); }
     }
-
     function saveTransaction(e) {
       e.preventDefault();
+      const editId = document.getElementById("editId").value;
       const tgl = document.getElementById("inputTgl").value;
       const ambil = Number(document.getElementById("inputAmbil").value) || 0;
       const setor = Number(document.getElementById("inputSetor").value) || 0;
       const pengeluaran = Number(document.getElementById("inputPengeluaran").value) || 0;
       const keterangan = document.getElementById("inputKeterangan").value.trim();
-
-      const newItem = { id: Date.now(), tgl, ambil, setor, pengeluaran, keterangan };
-      transactions.unshift(newItem);
-      
+      if (editId) {
+        transactions = transactions.map(t => t.id == editId ? { ...t, tgl, ambil, setor, pengeluaran, keterangan } : t);
+        showToast("Catatan berhasil diperbarui!");
+      } else {
+        const newItem = { id: Date.now(), tgl, ambil, setor, pengeluaran, keterangan };
+        transactions.unshift(newItem);
+        showToast("Catatan berhasil disimpan!");
+      }
       localStorage.setItem("saldoTransactions", JSON.stringify(transactions));
       saveToCloud();
-
+      resetForm();
+      renderApp();
+      switchPage('utamaPage');
+    }
+    function editTransaction(id) {
+      const t = transactions.find(item => item.id == id);
+      if (!t) return;
+      document.getElementById("editId").value = t.id;
+      document.getElementById("inputTgl").value = t.tgl || '';
+      document.getElementById("inputAmbil").value = t.ambil || '';
+      document.getElementById("inputSetor").value = t.setor || '';
+      document.getElementById("inputPengeluaran").value = t.pengeluaran || '';
+      document.getElementById("inputKeterangan").value = t.keterangan || '';
+      document.getElementById("formTitle").textContent = "Edit Transaksi";
+      document.getElementById("submitBtn").textContent = "Perbarui Transaksi";
+      document.getElementById("cancelEditBtn").classList.remove("hidden");
+      switchPage('kalkulatorPage');
+    }
+    function resetForm() {
       document.getElementById("transactionForm").reset();
+      document.getElementById("editId").value = "";
+      document.getElementById("formTitle").textContent = "Form Input Saldo Baru";
+      document.getElementById("submitBtn").textContent = "Simpan Catatan";
+      document.getElementById("cancelEditBtn").classList.add("hidden");
       const now = new Date();
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       document.getElementById("inputTgl").value = now.toISOString().slice(0, 16);
-
-      renderApp();
-      showToast("Catatan berhasil disimpan!");
-      switchPage('utamaPage');
     }
-
     function deleteTransaction(id) {
       if (confirm("Hapus catatan ini?")) {
-        transactions = transactions.filter(t => t.id !== id);
+        transactions = transactions.filter(t => t.id != id);
         localStorage.setItem("saldoTransactions", JSON.stringify(transactions));
         saveToCloud();
         renderApp();
         showToast("Catatan dihapus");
       }
     }
-
+    function resetDateFilter() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      document.getElementById("filterStartDate").value = `${yyyy}-${mm}-01`;
+      document.getElementById("filterEndDate").value = new Date(yyyy, now.getMonth() + 1, 0).toISOString().split('T')[0];
+      renderApp();
+    }
     function renderApp() {
       const selectedMonth = document.getElementById("monthFilter").value;
-      
-      const filtered = transactions.filter(t => {
-        if (!t.tgl) return false;
-        return t.tgl.startsWith(selectedMonth);
-      });
-
-      let sumAmbil = 0;
-      let sumSetor = 0;
-      let sumPengeluaran = 0;
-
-      filtered.forEach(t => {
+      const monthlyFiltered = transactions.filter(t => t.tgl && t.tgl.startsWith(selectedMonth));
+      let sumAmbil = 0, sumSetor = 0, sumPengeluaran = 0;
+      monthlyFiltered.forEach(t => {
         sumAmbil += Number(t.ambil) || 0;
         sumSetor += Number(t.setor) || 0;
         sumPengeluaran += Number(t.pengeluaran) || 0;
       });
-
       let saldoUtama = sumAmbil - sumSetor;
-      let labaBersih = (sumSetor * 0.15) - sumPengeluaran;
-
+      let labaBersihBulan = (sumSetor * 0.15) - sumPengeluaran;
       document.getElementById("summarySaldo").textContent = formatRupiah(saldoUtama);
-      document.getElementById("summaryLaba").textContent = formatRupiah(labaBersih);
+      document.getElementById("summaryLaba").textContent = formatRupiah(labaBersihBulan);
       document.getElementById("totalAmbil").textContent = formatRupiah(sumAmbil);
       document.getElementById("totalSetor").textContent = formatRupiah(sumSetor);
       document.getElementById("totalPengeluaran").textContent = formatRupiah(sumPengeluaran);
-      document.getElementById("totalCatatan").textContent = `${filtered.length} Transaksi`;
-      document.getElementById("reportCount").textContent = `${filtered.length} data`;
-
-      const recentHtml = filtered.slice(0, 5).map(renderItemHTML).join("");
-      const fullHtml = filtered.map(renderItemHTML).join("");
-
-      document.getElementById("recentTransactionList").innerHTML = filtered.length === 0 ? 
-        `<div class="p-6 text-center text-slate-400 text-xs">Belum ada transaksi di bulan ini</div>` : recentHtml;
-
-      document.getElementById("fullTransactionList").innerHTML = filtered.length === 0 ? 
-        `<div class="p-6 text-center text-slate-400 text-xs">Belum ada transaksi di bulan ini</div>` : fullHtml;
+      document.getElementById("totalCatatan").textContent = `${monthlyFiltered.length} Transaksi`;
+      const recentHtml = monthlyFiltered.slice(0, 5).map(renderItemHTML).join("");
+      document.getElementById("recentTransactionList").innerHTML = monthlyFiltered.length === 0 ? `<div class="p-6 text-center text-slate-400 text-xs">Belum ada transaksi di bulan ini</div>` : recentHtml;
+      const startDate = document.getElementById("filterStartDate").value;
+      const endDate = document.getElementById("filterEndDate").value;
+      const reportFiltered = transactions.filter(t => {
+        if (!t.tgl) return false;
+        const tDate = t.tgl.split('T')[0];
+        if (startDate && tDate < startDate) return false;
+        if (endDate && tDate > endDate) return false;
+        return true;
+      });
+      let reportSetor = 0, reportPengeluaran = 0;
+      reportFiltered.forEach(t => {
+        reportSetor += Number(t.setor) || 0;
+        reportPengeluaran += Number(t.pengeluaran) || 0;
+      });
+      let reportLabaBersih = (reportSetor * 0.15) - reportPengeluaran;
+      document.getElementById("reportFilteredLaba").textContent = formatRupiah(reportLabaBersih);
+      document.getElementById("reportCount").textContent = `${reportFiltered.length} data`;
+      const fullHtml = reportFiltered.map(renderItemHTML).join("");
+      document.getElementById("fullTransactionList").innerHTML = reportFiltered.length === 0 ? `<div class="p-6 text-center text-slate-400 text-xs">Tidak ada data transaksi pada rentang tanggal tersebut</div>` : fullHtml;
     }
-
     function renderItemHTML(t) {
       return `
         <div class="p-3.5 hover:bg-slate-50 transition flex justify-between items-center text-xs">
@@ -343,17 +350,15 @@
               ${t.pengeluaran > 0 ? `<span class="text-slate-600">Keluar: <b class="text-rose-600">${formatRupiah(t.pengeluaran)}</b></span>` : ''}
             </div>
           </div>
-          <button onclick="deleteTransaction(${t.id})" class="text-slate-300 hover:text-rose-600 p-2 text-sm transition" title="Hapus">
-            🗑️
-          </button>
+          <div class="flex items-center gap-1">
+            <button onclick="editTransaction(${t.id})" class="text-slate-400 hover:text-blue-600 p-2 text-sm transition" title="Edit">✏️</button>
+            <button onclick="deleteTransaction(${t.id})" class="text-slate-300 hover:text-rose-600 p-2 text-sm transition" title="Hapus">🗑️</button>
+          </div>
         </div>
       `;
     }
-
     function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
+      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
   </script>
 </body>
