@@ -26,7 +26,7 @@
       <!-- 2 Kartu Besar Atas -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-rose-50 border border-rose-100 p-6 rounded-3xl shadow-sm">
-          <span class="text-xs font-black text-rose-500 uppercase tracking-wider block">SALDO UTAMA</span>
+          <span class="text-xs font-black text-rose-500 uppercase tracking-wider block">SALDO UTAMA (Kumulatif)</span>
           <h2 id="summarySaldo" class="text-2xl sm:text-3xl font-black text-rose-700 mt-2">Rp 0</h2>
         </div>
         <div class="bg-blue-50 border border-blue-100 p-6 rounded-3xl shadow-sm">
@@ -34,7 +34,7 @@
           <h2 id="summaryLaba" class="text-2xl sm:text-3xl font-black text-blue-700 mt-2">Rp 0</h2>
         </div>
       </div>
-      <!-- Kotak 4 Grid (Layout Ikon di Atas, Judul Tengah, Nominal Bawah) -->
+      <!-- Kotak 4 Grid -->
       <div class="grid grid-cols-2 gap-4">
         <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
           <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-xl mb-3">📦</div>
@@ -155,7 +155,7 @@
   </nav>
   <div id="toast" class="fixed bottom-22 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-2xl hidden z-50"></div>
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyiwciftduiRagTm-WfVcwquu8_y7j5Ck7OAR1MTzaBMb6khinaQ77tcFtRfJ2g490q/exec"; 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzwsf3A5osaCrHvFHqhvsEJgxsiD9m9vuNM2-dwu6M_Aj-nD8Z1faC1m0trS_MbMiLM/exec"; 
     let transactions = JSON.parse(localStorage.getItem("saldoTransactions")) || [];
     document.addEventListener("DOMContentLoaded", () => {
       const now = new Date();
@@ -175,7 +175,7 @@
     function formatDate(dateStr) {
       if (!dateStr) return "-";
       const d = new Date(dateStr);
-      return d.toLocaleDateString("id-ID", { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      return isNaN(d) ? dateStr : d.toLocaleDateString("id-ID", { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
     function switchPage(pageId) {
       document.querySelectorAll(".app-page").forEach(p => p.classList.add("hidden"));
@@ -291,23 +291,36 @@
       renderApp();
     }
     function renderApp() {
-      const selectedMonth = document.getElementById("monthFilter").value;
+      const selectedMonth = document.getElementById("monthFilter").value; // Format: YYYY-MM
+      
+      // 1. Data khusus bulan yang dipilih (untuk Total Ambil, Setor, Pengeluaran, & Laba Bulan tersebut)
       const monthlyFiltered = transactions.filter(t => t.tgl && t.tgl.startsWith(selectedMonth));
-      let sumAmbil = 0, sumSetor = 0, sumPengeluaran = 0;
+      let sumAmbilMonth = 0, sumSetorMonth = 0, sumPengeluaranMonth = 0;
       monthlyFiltered.forEach(t => {
-        sumAmbil += Number(t.ambil) || 0;
-        sumSetor += Number(t.setor) || 0;
-        sumPengeluaran += Number(t.pengeluaran) || 0;
+        sumAmbilMonth += Number(t.ambil) || 0;
+        sumSetorMonth += Number(t.setor) || 0;
+        sumPengeluaranMonth += Number(t.pengeluaran) || 0;
       });
-      let saldoUtama = sumAmbil - sumSetor;
-      let labaBersihBulan = (sumSetor * 0.15) - sumPengeluaran;
+      let labaBersihBulan = (sumSetorMonth * 0.15) - sumPengeluaranMonth;
+
+      // 2. Data KUMULATIF dari awal sampai bulan yang dipilih (untuk Saldo Utama berjalan)
+      const cumulativeFiltered = transactions.filter(t => t.tgl && t.tgl.slice(0, 7) <= selectedMonth);
+      let cumAmbil = 0, cumSetor = 0;
+      cumulativeFiltered.forEach(t => {
+        cumAmbil += Number(t.ambil) || 0;
+        cumSetor += Number(t.setor) || 0;
+      });
+      let saldoUtama = cumAmbil - cumSetor;
+
+      // Update Tampilan UI Utama
       document.getElementById("summarySaldo").textContent = formatRupiah(saldoUtama);
       document.getElementById("summaryLaba").textContent = formatRupiah(labaBersihBulan);
-      document.getElementById("totalAmbil").textContent = formatRupiah(sumAmbil);
-      document.getElementById("totalSetor").textContent = formatRupiah(sumSetor);
-      document.getElementById("totalPengeluaran").textContent = formatRupiah(sumPengeluaran);
+      document.getElementById("totalAmbil").textContent = formatRupiah(sumAmbilMonth);
+      document.getElementById("totalSetor").textContent = formatRupiah(sumSetorMonth);
+      document.getElementById("totalPengeluaran").textContent = formatRupiah(sumPengeluaranMonth);
       document.getElementById("totalCatatan").textContent = `${monthlyFiltered.length} Transaksi`;
       
+      // 3. Filter Rentang Tanggal di Halaman Laporan
       const startDate = document.getElementById("filterStartDate").value;
       const endDate = document.getElementById("filterEndDate").value;
       const reportFiltered = transactions.filter(t => {
