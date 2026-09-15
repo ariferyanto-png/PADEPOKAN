@@ -23,14 +23,14 @@
       <input type="month" id="monthFilter" onchange="renderApp()" class="bg-slate-50 border border-slate-200 text-slate-900 text-base rounded-xl px-4 py-2.5 outline-none font-bold focus:border-blue-600">
     </div>
     <section id="utamaPage" class="app-page space-y-4">
-      <!-- 2 Kartu Besar Atas -->
+      <!-- 2 Kartu Besar Atas (Keduanya Kumulatif) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-rose-50 border border-rose-100 p-6 rounded-3xl shadow-sm">
           <span class="text-xs font-black text-rose-500 uppercase tracking-wider block">SALDO UTAMA (Kumulatif)</span>
           <h2 id="summarySaldo" class="text-2xl sm:text-3xl font-black text-rose-700 mt-2">Rp 0</h2>
         </div>
         <div class="bg-blue-50 border border-blue-100 p-6 rounded-3xl shadow-sm">
-          <span class="text-xs font-black text-blue-600 uppercase tracking-wider block">LABA BERSIH (15%)</span>
+          <span class="text-xs font-black text-blue-600 uppercase tracking-wider block">LABA BERSIH (Kumulatif)</span>
           <h2 id="summaryLaba" class="text-2xl sm:text-3xl font-black text-blue-700 mt-2">Rp 0</h2>
         </div>
       </div>
@@ -293,7 +293,7 @@
     function renderApp() {
       const selectedMonth = document.getElementById("monthFilter").value; // Format: YYYY-MM
       
-      // 1. Data khusus bulan yang dipilih (untuk Total Ambil, Setor, Pengeluaran, & Laba Bulan tersebut)
+      // 1. Data khusus bulan yang dipilih (untuk Total Ambil, Setor, Pengeluaran & Jumlah Transaksi Bulan tersebut)
       const monthlyFiltered = transactions.filter(t => t.tgl && t.tgl.startsWith(selectedMonth));
       let sumAmbilMonth = 0, sumSetorMonth = 0, sumPengeluaranMonth = 0;
       monthlyFiltered.forEach(t => {
@@ -301,20 +301,21 @@
         sumSetorMonth += Number(t.setor) || 0;
         sumPengeluaranMonth += Number(t.pengeluaran) || 0;
       });
-      let labaBersihBulan = (sumSetorMonth * 0.15) - sumPengeluaranMonth;
 
-      // 2. Data KUMULATIF dari awal sampai bulan yang dipilih (untuk Saldo Utama berjalan)
+      // 2. Data KUMULATIF dari awal sampai bulan yang dipilih (untuk Saldo Utama & Laba Bersih berjalan)
       const cumulativeFiltered = transactions.filter(t => t.tgl && t.tgl.slice(0, 7) <= selectedMonth);
-      let cumAmbil = 0, cumSetor = 0;
+      let cumAmbil = 0, cumSetor = 0, cumPengeluaran = 0;
       cumulativeFiltered.forEach(t => {
         cumAmbil += Number(t.ambil) || 0;
         cumSetor += Number(t.setor) || 0;
+        cumPengeluaran += Number(t.pengeluaran) || 0;
       });
       let saldoUtama = cumAmbil - cumSetor;
+      let labaBersihKumulatif = (cumSetor * 0.15) - cumPengeluaran;
 
       // Update Tampilan UI Utama
       document.getElementById("summarySaldo").textContent = formatRupiah(saldoUtama);
-      document.getElementById("summaryLaba").textContent = formatRupiah(labaBersihBulan);
+      document.getElementById("summaryLaba").textContent = formatRupiah(labaBersihKumulatif);
       document.getElementById("totalAmbil").textContent = formatRupiah(sumAmbilMonth);
       document.getElementById("totalSetor").textContent = formatRupiah(sumSetorMonth);
       document.getElementById("totalPengeluaran").textContent = formatRupiah(sumPengeluaranMonth);
