@@ -23,9 +23,9 @@
       <input type="month" id="monthFilter" onchange="renderApp()" class="bg-slate-50 border border-slate-200 text-slate-900 text-base rounded-xl px-4 py-2.5 outline-none font-bold focus:border-blue-600">
     </div>
     <section id="utamaPage" class="app-page space-y-4">
-      <!-- 2 Kartu Besar Atas (Saldo Utama & Laba Bersih Custom) -->
+      <!-- 2 Kartu Besar Atas -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="bg-rose-50 border border-rose-100 p-5 sm:p-6 rounded-3xl shadow-sm flex flex-col justify-between">
+        <div class="bg-rose-50 border border-rose-100 p-6 rounded-3xl shadow-sm flex flex-col justify-between">
           <div>
             <span class="text-xs font-black text-rose-500 uppercase tracking-wider block">SALDO UTAMA (Kumulatif)</span>
             <h2 id="summarySaldo" class="text-2xl sm:text-3xl font-black text-rose-700 mt-2">Rp 0</h2>
@@ -118,8 +118,8 @@
           </button>
         </form>
       </div>
-    </section>
-        <section id="laporanPage" class="app-page hidden space-y-4">
+  </section>
+      <section id="laporanPage" class="app-page hidden space-y-4">
       <div class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-sm space-y-3.5">
         <span class="text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider block">Filter Laporan & Laba Bersih</span>
         <div class="grid grid-cols-2 gap-3">
@@ -169,6 +169,7 @@
     </button>
   </nav>
   <div id="toast" class="fixed bottom-22 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-2xl hidden z-50"></div>
+  
   <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzwsf3A5osaCrHvFHqhvsEJgxsiD9m9vuNM2-dwu6M_Aj-nD8Z1faC1m0trS_MbMiLM/exec"; 
     let transactions = JSON.parse(localStorage.getItem("saldoTransactions")) || [];
@@ -180,7 +181,6 @@
       const firstDay = `${yyyy}-${mm}-01`;
       const lastDay = new Date(yyyy, now.getMonth() + 1, 0).toISOString().split('T')[0];
       
-      // Mengambil data filter terakhir dari memori (jika ada), jika tidak ada gunakan default bulan ini
       document.getElementById("monthFilter").value = localStorage.getItem("saved_monthFilter") || `${yyyy}-${mm}`;
       document.getElementById("labaStartDate").value = localStorage.getItem("saved_labaStart") || firstDay;
       document.getElementById("labaEndDate").value = localStorage.getItem("saved_labaEnd") || lastDay;
@@ -267,7 +267,7 @@
       const keterangan = document.getElementById("inputKeterangan").value.trim();
       
       if (editId) {
-        transactions = transactions.map(t => t.id == editId ? { ...t, tgl, ambil, setor, pengeluaran, keterangan } : t);
+        transactions = transactions.map(t => String(t.id) === String(editId) ? { ...t, tgl, ambil, setor, pengeluaran, keterangan } : t);
         showToast("Catatan berhasil diperbarui!");
       } else {
         const newItem = { id: Date.now(), tgl, ambil, setor, pengeluaran, keterangan };
@@ -283,7 +283,7 @@
     }
 
     function editTransaction(id) {
-      const t = transactions.find(item => item.id == id);
+      const t = transactions.find(item => String(item.id) === String(id));
       if (!t) return;
       document.getElementById("editId").value = t.id;
       document.getElementById("inputTgl").value = t.tgl || '';
@@ -315,24 +315,31 @@
       document.getElementById("filterStartDate").value = `${yyyy}-${mm}-01`;
       document.getElementById("filterEndDate").value = new Date(yyyy, now.getMonth() + 1, 0).toISOString().split('T')[0];
       
-      // Hapus memori filter laporan khusus saat tombol reset diklik
       localStorage.removeItem("saved_reportStart");
       localStorage.removeItem("saved_reportEnd");
       
       renderApp();
     }
 
+    function deleteTransaction(id) {
+      if (confirm("Hapus catatan ini?")) {
+        transactions = transactions.filter(t => String(t.id) !== String(id));
+        localStorage.setItem("saldoTransactions", JSON.stringify(transactions));
+        saveToCloud();
+        renderApp();
+        showToast("Catatan dihapus");
+      }
+    }
+
     function renderApp() {
       const selectedMonth = document.getElementById("monthFilter").value; 
       
-      // Simpan status filter saat ini ke localStorage
       localStorage.setItem("saved_monthFilter", document.getElementById("monthFilter").value);
       localStorage.setItem("saved_labaStart", document.getElementById("labaStartDate").value);
       localStorage.setItem("saved_labaEnd", document.getElementById("labaEndDate").value);
       localStorage.setItem("saved_reportStart", document.getElementById("filterStartDate").value);
       localStorage.setItem("saved_reportEnd", document.getElementById("filterEndDate").value);
       
-      // 1. Data KHUSUS BULAN
       const monthlyFiltered = transactions.filter(t => t.tgl && t.tgl.startsWith(selectedMonth));
       let sumAmbilMonth = 0, sumSetorMonth = 0, sumPengeluaranMonth = 0;
       monthlyFiltered.forEach(t => {
@@ -341,7 +348,6 @@
         sumPengeluaranMonth += Number(t.pengeluaran) || 0;
       });
 
-      // 2. Data KUMULATIF
       const cumulativeFiltered = transactions.filter(t => t.tgl && t.tgl.slice(0, 7) <= selectedMonth);
       let cumAmbil = 0, cumSetor = 0;
       cumulativeFiltered.forEach(t => {
@@ -350,7 +356,6 @@
       });
       let saldoUtama = cumAmbil - cumSetor;
 
-      // 3. Data LABA BERSIH CUSTOM
       const labaStart = document.getElementById("labaStartDate").value;
       const labaEnd = document.getElementById("labaEndDate").value;
       const labaFiltered = transactions.filter(t => {
@@ -367,7 +372,6 @@
       });
       let labaCustomDashboard = (labaSetor * 0.15) - labaPengeluaran;
 
-      // Update Tampilan Utama
       document.getElementById("summarySaldo").textContent = formatRupiah(saldoUtama);
       document.getElementById("summaryLaba").textContent = formatRupiah(labaCustomDashboard);
       document.getElementById("totalAmbil").textContent = formatRupiah(sumAmbilMonth);
@@ -375,7 +379,6 @@
       document.getElementById("totalPengeluaran").textContent = formatRupiah(sumPengeluaranMonth);
       document.getElementById("totalCatatan").textContent = `${monthlyFiltered.length} Transaksi`;
       
-      // 4. Data Filter Halaman Laporan
       const startDate = document.getElementById("filterStartDate").value;
       const endDate = document.getElementById("filterEndDate").value;
       const reportFiltered = transactions.filter(t => {
@@ -394,6 +397,7 @@
       
       document.getElementById("reportFilteredLaba").textContent = formatRupiah(reportLabaBersih);
       document.getElementById("reportCount").textContent = `${reportFiltered.length} data`;
+      
       const fullHtml = reportFiltered.map(renderItemHTML).join("");
       document.getElementById("fullTransactionList").innerHTML = reportFiltered.length === 0 ? `<div class="p-6 text-center text-slate-400 text-sm">Tidak ada data transaksi pada rentang tanggal tersebut</div>` : fullHtml;
     }
@@ -413,8 +417,8 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="editTransaction(${t.id})" class="text-slate-400 hover:text-blue-600 p-2.5 text-base transition" title="Edit">✏️</button>
-            <button onclick="deleteTransaction(${t.id})" class="text-slate-300 hover:text-rose-600 p-2.5 text-base transition" title="Hapus">🗑️</button>
+            <button onclick="editTransaction('${t.id}')" class="text-slate-400 hover:text-blue-600 p-2.5 text-base transition" title="Edit">✏️</button>
+            <button onclick="deleteTransaction('${t.id}')" class="text-slate-300 hover:text-rose-600 p-2.5 text-base transition" title="Hapus">🗑️</button>
           </div>
         </div>
       `;
