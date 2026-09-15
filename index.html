@@ -23,15 +23,30 @@
       <input type="month" id="monthFilter" onchange="renderApp()" class="bg-slate-50 border border-slate-200 text-slate-900 text-base rounded-xl px-4 py-2.5 outline-none font-bold focus:border-blue-600">
     </div>
     <section id="utamaPage" class="app-page space-y-4">
-      <!-- 2 Kartu Besar Atas -->
+      <!-- 2 Kartu Besar Atas (Saldo Utama & Laba Bersih Custom) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="bg-rose-50 border border-rose-100 p-6 rounded-3xl shadow-sm">
-          <span class="text-xs font-black text-rose-500 uppercase tracking-wider block">SALDO UTAMA (Kumulatif)</span>
-          <h2 id="summarySaldo" class="text-2xl sm:text-3xl font-black text-rose-700 mt-2">Rp 0</h2>
+        <div class="bg-rose-50 border border-rose-100 p-5 sm:p-6 rounded-3xl shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-black text-rose-500 uppercase tracking-wider block">SALDO UTAMA (Kumulatif)</span>
+            <h2 id="summarySaldo" class="text-2xl sm:text-3xl font-black text-rose-700 mt-2">Rp 0</h2>
+          </div>
         </div>
-        <div class="bg-blue-50 border border-blue-100 p-6 rounded-3xl shadow-sm">
-          <span class="text-xs font-black text-blue-600 uppercase tracking-wider block">LABA BERSIH (15%)</span>
-          <h2 id="summaryLaba" class="text-2xl sm:text-3xl font-black text-blue-700 mt-2">Rp 0</h2>
+        <div class="bg-blue-50 border border-blue-100 p-5 rounded-3xl shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-black text-blue-600 uppercase tracking-wider block">LABA BERSIH (15%)</span>
+            <h2 id="summaryLaba" class="text-2xl sm:text-3xl font-black text-blue-700 mt-1 mb-3">Rp 0</h2>
+          </div>
+          <!-- Filter Tanggal Khusus Laba Bersih -->
+          <div class="grid grid-cols-2 gap-2 mt-auto pt-3 border-t border-blue-200">
+            <div>
+              <label class="block text-[10px] font-bold text-blue-500 mb-1 uppercase">Dari Tgl</label>
+              <input type="date" id="labaStartDate" onchange="renderApp()" class="w-full bg-white border border-blue-200 text-blue-800 text-xs rounded-xl px-2 py-1.5 outline-none font-bold focus:border-blue-600">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-blue-500 mb-1 uppercase">Sampai Tgl</label>
+              <input type="date" id="labaEndDate" onchange="renderApp()" class="w-full bg-white border border-blue-200 text-blue-800 text-xs rounded-xl px-2 py-1.5 outline-none font-bold focus:border-blue-600">
+            </div>
+          </div>
         </div>
       </div>
       <!-- Kotak 4 Grid -->
@@ -103,8 +118,8 @@
           </button>
         </form>
       </div>
-  </section>
-      <section id="laporanPage" class="app-page hidden space-y-4">
+    </section>
+        <section id="laporanPage" class="app-page hidden space-y-4">
       <div class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-sm space-y-3.5">
         <span class="text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider block">Filter Laporan & Laba Bersih</span>
         <div class="grid grid-cols-2 gap-3">
@@ -157,26 +172,38 @@
   <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzwsf3A5osaCrHvFHqhvsEJgxsiD9m9vuNM2-dwu6M_Aj-nD8Z1faC1m0trS_MbMiLM/exec"; 
     let transactions = JSON.parse(localStorage.getItem("saldoTransactions")) || [];
+    
     document.addEventListener("DOMContentLoaded", () => {
       const now = new Date();
       const yyyy = now.getFullYear();
       const mm = String(now.getMonth() + 1).padStart(2, '0');
       document.getElementById("monthFilter").value = `${yyyy}-${mm}`;
+      
       const firstDay = `${yyyy}-${mm}-01`;
       const lastDay = new Date(yyyy, now.getMonth() + 1, 0).toISOString().split('T')[0];
+      
+      // Default Filter di Halaman Laporan
       document.getElementById("filterStartDate").value = firstDay;
       document.getElementById("filterEndDate").value = lastDay;
+      
+      // Default Filter Khusus di Kotak Laba Bersih (Halaman Utama)
+      document.getElementById("labaStartDate").value = firstDay;
+      document.getElementById("labaEndDate").value = lastDay;
+      
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       document.getElementById("inputTgl").value = now.toISOString().slice(0, 16);
+      
       renderApp();
       loadFromCloud();
     });
+
     function formatRupiah(num) { return "Rp " + Number(num).toLocaleString("id-ID"); }
     function formatDate(dateStr) {
       if (!dateStr) return "-";
       const d = new Date(dateStr);
       return isNaN(d) ? dateStr : d.toLocaleDateString("id-ID", { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
+
     function switchPage(pageId) {
       document.querySelectorAll(".app-page").forEach(p => p.classList.add("hidden"));
       document.getElementById(pageId).classList.remove("hidden");
@@ -188,7 +215,9 @@
         document.getElementById("navUtama").classList.add("text-blue-600", "font-bold");
         document.getElementById("navUtama").classList.remove("text-slate-400", "font-medium");
         document.getElementById("filterBulanContainer").classList.remove("hidden");
-      } else { document.getElementById("filterBulanContainer").classList.add("hidden"); }
+      } else { 
+        document.getElementById("filterBulanContainer").classList.add("hidden"); 
+      }
       if (pageId === 'kalkulatorPage') {
         document.getElementById("navKalkulator").classList.add("text-blue-600", "font-bold");
         document.getElementById("navKalkulator").classList.remove("text-slate-400", "font-medium");
@@ -198,12 +227,14 @@
       }
       window.scrollTo(0, 0);
     }
+
     function showToast(msg) {
       const t = document.getElementById("toast");
       t.textContent = msg;
       t.classList.remove("hidden");
       setTimeout(() => t.classList.add("hidden"), 2500);
     }
+
     async function loadFromCloud() {
       if (!WEB_APP_URL) return;
       try {
@@ -216,6 +247,7 @@
         }
       } catch (e) { console.log("Sinkronisasi cloud gagal."); }
     }
+
     async function saveToCloud() {
       if (!WEB_APP_URL) return;
       try {
@@ -227,6 +259,7 @@
         });
       } catch (e) { console.log("Simpan cloud tertunda."); }
     }
+
     function saveTransaction(e) {
       e.preventDefault();
       const editId = document.getElementById("editId").value;
@@ -235,6 +268,7 @@
       const setor = Number(document.getElementById("inputSetor").value) || 0;
       const pengeluaran = Number(document.getElementById("inputPengeluaran").value) || 0;
       const keterangan = document.getElementById("inputKeterangan").value.trim();
+      
       if (editId) {
         transactions = transactions.map(t => t.id == editId ? { ...t, tgl, ambil, setor, pengeluaran, keterangan } : t);
         showToast("Catatan berhasil diperbarui!");
@@ -243,12 +277,14 @@
         transactions.unshift(newItem);
         showToast("Catatan berhasil disimpan!");
       }
+      
       localStorage.setItem("saldoTransactions", JSON.stringify(transactions));
       saveToCloud();
       resetForm();
       renderApp();
       switchPage('utamaPage');
     }
+
     function editTransaction(id) {
       const t = transactions.find(item => item.id == id);
       if (!t) return;
@@ -263,6 +299,7 @@
       document.getElementById("cancelEditBtn").classList.remove("hidden");
       switchPage('kalkulatorPage');
     }
+
     function resetForm() {
       document.getElementById("transactionForm").reset();
       document.getElementById("editId").value = "";
@@ -273,6 +310,7 @@
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       document.getElementById("inputTgl").value = now.toISOString().slice(0, 16);
     }
+
     function deleteTransaction(id) {
       if (confirm("Hapus catatan ini?")) {
         transactions = transactions.filter(t => t.id != id);
@@ -282,6 +320,7 @@
         showToast("Catatan dihapus");
       }
     }
+
     function resetDateFilter() {
       const now = new Date();
       const yyyy = now.getFullYear();
@@ -290,10 +329,11 @@
       document.getElementById("filterEndDate").value = new Date(yyyy, now.getMonth() + 1, 0).toISOString().split('T')[0];
       renderApp();
     }
+
     function renderApp() {
-      const selectedMonth = document.getElementById("monthFilter").value; // Format: YYYY-MM
+      const selectedMonth = document.getElementById("monthFilter").value; 
       
-      // 1. Data khusus bulan yang dipilih (untuk Total Ambil, Setor, Pengeluaran, & Laba Bulan tersebut)
+      // 1. Data KHUSUS BULAN (Total Ambil, Total Setor, Pengeluaran & Transaksi)
       const monthlyFiltered = transactions.filter(t => t.tgl && t.tgl.startsWith(selectedMonth));
       let sumAmbilMonth = 0, sumSetorMonth = 0, sumPengeluaranMonth = 0;
       monthlyFiltered.forEach(t => {
@@ -301,9 +341,8 @@
         sumSetorMonth += Number(t.setor) || 0;
         sumPengeluaranMonth += Number(t.pengeluaran) || 0;
       });
-      let labaBersihBulan = (sumSetorMonth * 0.15) - sumPengeluaranMonth;
 
-      // 2. Data KUMULATIF dari awal sampai bulan yang dipilih (untuk Saldo Utama berjalan)
+      // 2. Data KUMULATIF (Saldo Utama berjalan terus menerus)
       const cumulativeFiltered = transactions.filter(t => t.tgl && t.tgl.slice(0, 7) <= selectedMonth);
       let cumAmbil = 0, cumSetor = 0;
       cumulativeFiltered.forEach(t => {
@@ -312,15 +351,32 @@
       });
       let saldoUtama = cumAmbil - cumSetor;
 
-      // Update Tampilan UI Utama
+      // 3. Data LABA BERSIH CUSTOM (Khusus Kotak Laba Bersih di Dashboard)
+      const labaStart = document.getElementById("labaStartDate").value;
+      const labaEnd = document.getElementById("labaEndDate").value;
+      const labaFiltered = transactions.filter(t => {
+        if (!t.tgl) return false;
+        const tDate = t.tgl.split('T')[0];
+        if (labaStart && tDate < labaStart) return false;
+        if (labaEnd && tDate > labaEnd) return false;
+        return true;
+      });
+      let labaSetor = 0, labaPengeluaran = 0;
+      labaFiltered.forEach(t => {
+        labaSetor += Number(t.setor) || 0;
+        labaPengeluaran += Number(t.pengeluaran) || 0;
+      });
+      let labaCustomDashboard = (labaSetor * 0.15) - labaPengeluaran;
+
+      // Update Teks Tampilan Utama Dashboard
       document.getElementById("summarySaldo").textContent = formatRupiah(saldoUtama);
-      document.getElementById("summaryLaba").textContent = formatRupiah(labaBersihBulan);
+      document.getElementById("summaryLaba").textContent = formatRupiah(labaCustomDashboard);
       document.getElementById("totalAmbil").textContent = formatRupiah(sumAmbilMonth);
       document.getElementById("totalSetor").textContent = formatRupiah(sumSetorMonth);
       document.getElementById("totalPengeluaran").textContent = formatRupiah(sumPengeluaranMonth);
       document.getElementById("totalCatatan").textContent = `${monthlyFiltered.length} Transaksi`;
       
-      // 3. Filter Rentang Tanggal di Halaman Laporan
+      // 4. Data Filter di Halaman Laporan (Riwayat Transaksi)
       const startDate = document.getElementById("filterStartDate").value;
       const endDate = document.getElementById("filterEndDate").value;
       const reportFiltered = transactions.filter(t => {
@@ -336,11 +392,14 @@
         reportPengeluaran += Number(t.pengeluaran) || 0;
       });
       let reportLabaBersih = (reportSetor * 0.15) - reportPengeluaran;
+      
+      // Update Teks Tampilan Halaman Laporan
       document.getElementById("reportFilteredLaba").textContent = formatRupiah(reportLabaBersih);
       document.getElementById("reportCount").textContent = `${reportFiltered.length} data`;
       const fullHtml = reportFiltered.map(renderItemHTML).join("");
       document.getElementById("fullTransactionList").innerHTML = reportFiltered.length === 0 ? `<div class="p-6 text-center text-slate-400 text-sm">Tidak ada data transaksi pada rentang tanggal tersebut</div>` : fullHtml;
     }
+
     function renderItemHTML(t) {
       return `
         <div class="p-4 hover:bg-slate-50 transition flex justify-between items-center text-sm">
@@ -362,6 +421,7 @@
         </div>
       `;
     }
+
     function escapeHTML(str) {
       return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
