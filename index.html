@@ -50,15 +50,15 @@
         </div>
       </div>
       <!-- Kotak 4 Grid -->
-      <div class="grid grid-cols-2 gap-4">
-        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="grid grid-cols-2 gap-4">
+        <div onclick="openDetailModal('ambil')" class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer hover:bg-slate-50 transition active:scale-95">
           <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-xl mb-3">📦</div>
           <div>
             <span class="text-xs text-slate-400 font-extrabold block uppercase">Total Ambil</span>
             <p id="totalAmbil" class="text-base sm:text-lg font-black text-slate-800 mt-1">Rp 0</p>
           </div>
         </div>
-        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div onclick="openDetailModal('setor')" class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer hover:bg-slate-50 transition active:scale-95">
           <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-xl mb-3">📥</div>
           <div>
             <span class="text-xs text-slate-400 font-extrabold block uppercase">Total Setor</span>
@@ -67,7 +67,7 @@
         </div>
       </div>
       <div class="grid grid-cols-2 gap-4">
-        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div onclick="openDetailModal('pengeluaran')" class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer hover:bg-slate-50 transition active:scale-95">
           <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-xl mb-3">💸</div>
           <div>
             <span class="text-xs text-slate-400 font-extrabold block uppercase">Pengeluaran</span>
@@ -153,6 +153,22 @@
         </div>
       </div>
     </section>
+    <!-- Modal Detail Transaksi -->
+<div id="detailModal" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+  <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl max-h-[85vh] flex flex-col shadow-2xl transform transition-transform translate-y-full sm:translate-y-0" id="detailModalContent">
+    <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-3xl sm:rounded-3xl z-10 sticky top-0">
+      <div>
+        <h3 id="modalTitle" class="font-black text-slate-800 text-lg">Detail Transaksi</h3>
+        <p id="modalSubtitle" class="text-xs text-slate-500 mt-0.5">Periode Bulan Ini</p>
+      </div>
+      <button onclick="closeDetailModal()" class="w-8 h-8 flex items-center justify-center bg-slate-100 text-slate-500 rounded-full font-bold hover:bg-slate-200 transition">✕</button>
+    </div>
+    <div id="detailList" class="p-4 overflow-y-auto flex-1 space-y-3 bg-slate-50/50">
+      <!-- Daftar transaksi akan dimuat di sini -->
+    </div>
+  </div>
+</div>
+    
   </main>
   <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 h-18 flex justify-around items-center z-40 px-4 shadow-xl">
     <button onclick="switchPage('utamaPage')" id="navUtama" class="nav-btn flex flex-col items-center gap-1 text-blue-600 font-bold">
@@ -427,6 +443,90 @@
     function escapeHTML(str) {
       return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
+        // --- Logika Modal Detail Transaksi ---
+    function openDetailModal(type) {
+      const modal = document.getElementById('detailModal');
+      const modalContent = document.getElementById('detailModalContent');
+      const title = document.getElementById('modalTitle');
+      const listContainer = document.getElementById('detailList');
+      
+      const selectedMonth = document.getElementById("monthFilter").value;
+      const labaStart = document.getElementById("labaStartDate").value;
+      const labaEnd = document.getElementById("labaEndDate").value;
+      
+      let filteredData = [];
+      let judul = "";
+      
+      // Filter data dan tentukan judul berdasarkan jenis kartu yang diklik
+      if (type === 'ambil') {
+        judul = "Riwayat Pengambilan";
+        filteredData = transactions.filter(t => t.tgl && t.tgl.startsWith(selectedMonth) && (Number(t.ambil) > 0));
+      } else if (type === 'setor') {
+        judul = "Riwayat Penyetoran";
+        filteredData = transactions.filter(t => t.tgl && t.tgl.startsWith(selectedMonth) && (Number(t.setor) > 0));
+      } else if (type === 'pengeluaran') {
+        judul = "Riwayat Pengeluaran";
+        // Pengeluaran difilter menggunakan periode tanggal Laba Bersih
+        filteredData = transactions.filter(t => {
+          if (!t.tgl || Number(t.pengeluaran) <= 0) return false;
+          const tDate = t.tgl.split('T')[0];
+          if (labaStart && tDate < labaStart) return false;
+          if (labaEnd && tDate > labaEnd) return false;
+          return true;
+        });
+      }
+      
+      title.textContent = judul;
+      
+      // Buat HTML untuk daftar transaksi
+      if (filteredData.length === 0) {
+        listContainer.innerHTML = `<div class="text-center p-6 text-slate-400 text-sm font-medium">Tidak ada data transaksi untuk kategori ini.</div>`;
+      } else {
+        listContainer.innerHTML = filteredData.map(t => {
+          let nominal = 0;
+          let warnaNominal = '';
+          if (type === 'ambil') { nominal = t.ambil; warnaNominal = 'text-blue-600'; }
+          else if (type === 'setor') { nominal = t.setor; warnaNominal = 'text-emerald-600'; }
+          else if (type === 'pengeluaran') { nominal = t.pengeluaran; warnaNominal = 'text-rose-600'; }
+          
+          return `
+            <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+              <div class="flex justify-between items-start mb-2">
+                <span class="text-xs font-bold text-slate-400">${formatDate(t.tgl)}</span>
+                <span class="font-black ${warnaNominal} text-sm">${formatRupiah(nominal)}</span>
+              </div>
+              ${t.keterangan ? `<div class="bg-slate-50 p-2.5 rounded-xl text-sm text-slate-700 mt-1.5"><span class="font-semibold">Catatan:</span> ${escapeHTML(t.keterangan)}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+      
+      // Tampilkan Modal dengan animasi
+      modal.classList.remove('hidden');
+      // Beri sedikit jeda untuk memicu transisi transform
+      setTimeout(() => {
+        modalContent.classList.remove('translate-y-full');
+      }, 10);
+    }
+
+    function closeDetailModal() {
+      const modal = document.getElementById('detailModal');
+      const modalContent = document.getElementById('detailModalContent');
+      
+      // Animasi sembunyikan
+      modalContent.classList.add('translate-y-full');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300); // Sesuaikan dengan durasi transisi Tailwind
+    }
+    
+    // Tambahkan event listener untuk menutup modal jika area luar (backdrop) diklik
+    document.getElementById('detailModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeDetailModal();
+      }
+    });
+    
   </script>
 </body>
 </html>
